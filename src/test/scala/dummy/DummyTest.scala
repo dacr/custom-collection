@@ -42,6 +42,7 @@ class DummyTest extends FunSuite with ShouldMatchers {
   }
 
 
+  
   test("custom seq test") {
     val l = CustomSeq(1, 2, 3, 4)
     val c = List(5,6,7)    
@@ -64,45 +65,56 @@ class DummyTest extends FunSuite with ShouldMatchers {
   }
 
   
+  
   test("custom seq test 1") {
-    val cs = CustomSeq2("1", "2", "3")
+    val cs = MySeq("1", "2", "3")
     info(cs.toString)
-    cs  should be equals (CustomSeq2("1","2","3"))
+    cs  should be equals (MySeq("1","2","3"))
     
     val scs = cs.map(_.toInt)
     info(scs.toString)
-    scs  should be equals (CustomSeq2(1,2,3))
-    scs.getClass.getName should include("CustomSeq2")
+    
+    scs  should be equals (MySeq(1,2,3))
+    
+    scs.getClass.getName should include("MySeq")
   }
+  
   
   
   test("custom seq test 2") {
     val cs = NamedSeq("toto", "1", "2", "3")
     info(cs.toString)
+    
     cs  should be equals (NamedSeq("toto", "1","2","3"))
     
     val scs = cs.map(_.toInt)
     info(scs.toString)
+    
     scs  should be equals (NamedSeq("toto", 1,2,3))
+    
     scs.getClass.getName should include("NamedSeq")
   }
   
   
+  
   test("custom seq test 3") {
-    val cs  = CustomSeq2(5,6,7,8)
+    val cs  = MySeq(5,6,7,8)
     val scs = cs.filter(_ > 6)
     
     val ncs  = NamedSeq("myseq", 1,2,3,4)
     val nscs = ncs.filter(_ > 2)
     
     (nscs :+ 10)      should be equals(NamedSeq("myseq", 3,4,10))
+    
     (nscs ++ scs)     should be equals(NamedSeq("myseq", 3,4,7,8))
-    (scs ++ nscs)     should be equals(CustomSeq2(7,8,3,4))
+    
+    (scs ++ nscs)     should be equals(MySeq(7,8,3,4))
+    
     (nscs.map(_ + 1)) should be equals(NamedSeq("myseq",4,5))
     
     (nscs.map(_.toString))  should be equals(NamedSeq("myseq","3","4"))
 
-    (scs.map(_.toString))  should be equals(CustomSeq2("7","8"))
+    (scs.map(_.toString))  should be equals(MySeq("7","8"))
   }
   
 }

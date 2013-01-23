@@ -53,7 +53,10 @@ class CustomSeq[A](seq : A*)
   
   override def companion = CustomSeq
   def iterator: Iterator[A] = seq.iterator
-  def apply(idx: Int): A = if (idx>length) throw new IndexOutOfBoundsException else seq(idx)
+  def apply(idx: Int): A = {
+    if (idx < 0 || idx>=length) throw new IndexOutOfBoundsException
+    seq(idx)
+  }
   def length: Int = seq.size
 }
 
@@ -61,31 +64,32 @@ class CustomSeq[A](seq : A*)
 
 // ================================ CustomSeq ==================================
 
-object CustomSeq2 {
+object MySeq {
 
   def apply[Base](bases: Base*) = fromSeq(bases)
 
-  def fromSeq[Base](buf: Seq[Base]): CustomSeq2[Base] = {
+  def fromSeq[Base](buf: Seq[Base]): MySeq[Base] = {
     var array = new ArrayBuffer[Base](buf.size)
     for (i <- 0 until buf.size) array += buf(i)
-    new CustomSeq2[Base](array)
+    new MySeq[Base](array)
   }
 
-  def newBuilder[Base]: Builder[Base, CustomSeq2[Base]] =
+  def newBuilder[Base]: Builder[Base, MySeq[Base]] =
     new ArrayBuffer mapResult fromSeq
 
-  implicit def canBuildFrom[Base,From]: CanBuildFrom[CustomSeq2[_], Base, CustomSeq2[Base]] =
-    new CanBuildFrom[CustomSeq2[_], Base, CustomSeq2[Base]] {
-      def apply(): Builder[Base, CustomSeq2[Base]] = newBuilder
-      def apply(from: CustomSeq2[_]): Builder[Base, CustomSeq2[Base]] = newBuilder
+  implicit def canBuildFrom[Base,From]: CanBuildFrom[MySeq[_], Base, MySeq[Base]] =
+    new CanBuildFrom[MySeq[_], Base, MySeq[Base]] {
+      def apply(): Builder[Base, MySeq[Base]] = newBuilder
+      def apply(from: MySeq[_]): Builder[Base, MySeq[Base]] = newBuilder
     }
 }
 
-class CustomSeq2[Base] protected (buffer: ArrayBuffer[Base])
+
+class MySeq[Base] protected (buffer: ArrayBuffer[Base])
        extends IndexedSeq[Base]
-       with IndexedSeqLike[Base, CustomSeq2[Base]] {
+       with IndexedSeqLike[Base, MySeq[Base]] {
   
-  override protected[this] def newBuilder: Builder[Base, CustomSeq2[Base]] = CustomSeq2.newBuilder
+  override protected[this] def newBuilder: Builder[Base, MySeq[Base]] = MySeq.newBuilder
 
   def apply(idx: Int): Base = {
     if (idx < 0 || length <= idx) throw new IndexOutOfBoundsException
@@ -112,7 +116,7 @@ object NamedSeq {
 
   implicit def canBuildFrom[Base]: CanBuildFrom[NamedSeq[_], Base, NamedSeq[Base]] =
     new CanBuildFrom[NamedSeq[_], Base, NamedSeq[Base]] {
-      def apply(): Builder[Base, NamedSeq[Base]] = newBuilder("") // TODO ??
+      def apply(): Builder[Base, NamedSeq[Base]] = newBuilder("default")
       def apply(from: NamedSeq[_]): Builder[Base, NamedSeq[Base]] = newBuilder(from.name)
     }
 }
@@ -130,6 +134,8 @@ class NamedSeq[Base] protected (
   }
 
   def length = buffer.length
+  
+  override def toString() = "NamedSeq("+name+" : "+mkString(", ")+")"
 }
 
 
