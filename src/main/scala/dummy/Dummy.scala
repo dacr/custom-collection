@@ -108,7 +108,7 @@ object NamedSeq {
   }
 
   def newBuilder[Base](name: String): Builder[Base, NamedSeq[Base]] =
-    new ArrayBuffer mapResult { x: ArrayBuffer[Base] => fromSeq("", x) }
+    new ArrayBuffer mapResult { x: ArrayBuffer[Base] => fromSeq(name, x) }
 
   implicit def canBuildFrom[Base]: CanBuildFrom[NamedSeq[_], Base, NamedSeq[Base]] =
     new CanBuildFrom[NamedSeq[_], Base, NamedSeq[Base]] {
