@@ -24,32 +24,85 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class DummyTest extends FunSuite with ShouldMatchers {
   
-  test("Simple test") {
-    val cs  = CustomSeq(1,2,3,4)
-    val scs = cs.filter(_ > 2)
-    println(scs.mkString(" "))
+  test("custom traversable test") {
+    val l = CustomTraversable(1, 2, 3, 4)
+    val c = List(5,6,7)    
+  
+    l should not be equals(List(1,2,3,4))
     
-    val ncs  = NamedSeq("my named seq", 1,2,3,4)
-    val nscs = ncs.filter(_ > 2)
+    (l ++ c) should be equals (CustomTraversable(1,2,3,4,5,6,7))
     
-    nscs.isInstanceOf[NamedSeq[Int]] should be (true)
+    (l.map(_.toString)) should be equals(CustomTraversable("1","2","3","4"))
     
-    (nscs :+ 10).isInstanceOf[NamedSeq[Int]] should be (true)
-    (nscs ++ scs).isInstanceOf[NamedSeq[Int]] should be (true)
-    (scs ++ nscs).isInstanceOf[CustomSeq[Int]] should be (true)
-    (nscs.map(_ + 1)).isInstanceOf[NamedSeq[Int]] should be (true)
+    (l.map(_.toString)).getClass.getName should include ("CustomTraversable")
     
-    val tmp = (nscs.map(i => s"(${i})"))
-    println(tmp.getClass().getName())
-    tmp.isInstanceOf[NamedSeq[String]] should be (true)
+    (l.filter(_ > 2)) should be equals(CustomTraversable(3,4))
+    
+    l.reduce(_ + _) should equal(10)
   }
+
+
+  test("custom seq test") {
+    val l = CustomSeq(1, 2, 3, 4)
+    val c = List(5,6,7)    
   
+    l should not be equals(List(1,2,3,4))
+    
+    (l :+ 8) should be equals (CustomSeq(1,2,3,4,8))
+    
+    (l ++ c) should be equals (CustomSeq(1,2,3,4,5,6,7))
+    
+    (l.map(_.toString)) should be equals (CustomSeq("1","2","3","4"))
+    
+    (l.map(_.toString)) should not be equals (IndexedSeq("1","2","3","4"))
+
+    (l.map(_.toString)).getClass.getName should include("CustomSeq")
+
+    (l.filter(_ > 2)) should be equals (CustomSeq(3,4))
+    
+    l.reduce(_ + _) should equal(10)
+  }
+
   
-  test("Second test") {
-    val cs = NamedSeq("toto", "1", "2", "3")
-    cs.isInstanceOf[NamedSeq[String]] should be (true)
+  test("custom seq test 1") {
+    val cs = CustomSeq2("1", "2", "3")
+    info(cs.toString)
+    cs  should be equals (CustomSeq2("1","2","3"))
     
     val scs = cs.map(_.toInt)
-    scs.isInstanceOf[NamedSeq[Int]] should be (true)
+    info(scs.toString)
+    scs  should be equals (CustomSeq2(1,2,3))
+    scs.getClass.getName should include("CustomSeq2")
   }
+  
+  
+  test("custom seq test 2") {
+    val cs = NamedSeq("toto", "1", "2", "3")
+    info(cs.toString)
+    cs  should be equals (NamedSeq("toto", "1","2","3"))
+    
+    val scs = cs.map(_.toInt)
+    info(scs.toString)
+    scs  should be equals (NamedSeq("toto", 1,2,3))
+    scs.getClass.getName should include("NamedSeq")
+  }
+  
+  
+  test("custom seq test 3") {
+    val cs  = CustomSeq2(5,6,7,8)
+    val scs = cs.filter(_ > 6)
+    
+    val ncs  = NamedSeq("myseq", 1,2,3,4)
+    val nscs = ncs.filter(_ > 2)
+    
+    (nscs :+ 10)      should be equals(NamedSeq("myseq", 3,4,10))
+    (nscs ++ scs)     should be equals(NamedSeq("myseq", 3,4,7,8))
+    (scs ++ nscs)     should be equals(CustomSeq2(7,8,3,4))
+    (nscs.map(_ + 1)) should be equals(NamedSeq("myseq",4,5))
+    
+    (nscs.map(_.toString))  should be equals(NamedSeq("myseq","3","4"))
+
+    (scs.map(_.toString))  should be equals(CustomSeq2("7","8"))
+  }
+  
 }
