@@ -24,7 +24,7 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class DummyTest extends FunSuite with ShouldMatchers {
   
-  test("custom traversable test") {
+  test("CustomTraversable test") {
     val l = CustomTraversable(1, 2, 3, 4)
     val c = List(5,6,7)    
   
@@ -38,12 +38,14 @@ class DummyTest extends FunSuite with ShouldMatchers {
     
     (l.filter(_ > 2)) should be equals(CustomTraversable(3,4))
     
+    (l.filter(_ > 2)).getClass.getName should include("CustomTraversable")
+    
     l.reduce(_ + _) should equal(10)
   }
 
 
   
-  test("custom seq test") {
+  test("CustomSeq test") {
     val l = CustomSeq(1, 2, 3, 4)
     val c = List(5,6,7)    
   
@@ -61,12 +63,14 @@ class DummyTest extends FunSuite with ShouldMatchers {
 
     (l.filter(_ > 2)) should be equals (CustomSeq(3,4))
     
+    (l.filter(_ > 2)).getClass.getName should include("CustomSeq")
+    
     l.reduce(_ + _) should equal(10)
   }
 
   
   
-  test("custom seq test 1") {
+  test("MySeq test") {
     val cs = MySeq("1", "2", "3")
     info(cs.toString)
     cs  should be equals (MySeq("1","2","3"))
@@ -75,13 +79,13 @@ class DummyTest extends FunSuite with ShouldMatchers {
     info(scs.toString)
     
     scs  should be equals (MySeq(1,2,3))
-    
+        
     scs.getClass.getName should include("MySeq")
   }
   
   
   
-  test("custom seq test 2") {
+  test("NamedSeq test") {
     val cs = NamedSeq("toto", "1", "2", "3")
     info(cs.toString)
     
@@ -92,12 +96,14 @@ class DummyTest extends FunSuite with ShouldMatchers {
     
     scs  should be equals (NamedSeq("toto", 1,2,3))
     
+    scs  should not be equals (NamedSeq("tata", 1,2,3))
+    
     scs.getClass.getName should include("NamedSeq")
   }
   
   
   
-  test("custom seq test 3") {
+  test("NamedSeq && MySeq combined test") {
     val cs  = MySeq(5,6,7,8)
     val scs = cs.filter(_ > 6)
     
@@ -108,7 +114,13 @@ class DummyTest extends FunSuite with ShouldMatchers {
     
     (nscs ++ scs)     should be equals(NamedSeq("myseq", 3,4,7,8))
     
+    (nscs ++ scs)     should not be equals(NamedSeq("trucmuche", 3,4,7,8))
+    
+    (nscs ++ scs).getClass.getName should include("NamedSeq")
+    
     (scs ++ nscs)     should be equals(MySeq(7,8,3,4))
+    
+    (scs ++ nscs).getClass.getName should include("MySeq")
     
     (nscs.map(_ + 1)) should be equals(NamedSeq("myseq",4,5))
     
