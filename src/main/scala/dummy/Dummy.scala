@@ -108,7 +108,7 @@ object NamedSeq {
   def fromSeq[Base](name: String, buf: Seq[Base]): NamedSeq[Base] = {
     var array = new ArrayBuffer[Base](buf.size)
     for (i <- 0 until buf.size) array += buf(i)
-    new NamedSeq[Base](name: String, array)
+    new NamedSeq[Base](name, array)
   }
 
   def newBuilder[Base](name: String): Builder[Base, NamedSeq[Base]] =
@@ -138,7 +138,19 @@ class NamedSeq[Base] protected (
   override def toString() = "NamedSeq("+name+" : "+mkString(", ")+")"
 }
 
+// ============================= CustomMap ===================================
 
+/*
+object CustomMap extends ImmutableMapFactory[CustomMap] {
+  override def empty[KEY, VAL]: Coll = new CustomMap[KEY,VAL]()
+}
+
+class CustomMap[KEY,VAL] protected() 
+   extends Map[KEY,VAL]
+   with MapLike[KEY,VAL,CustomMap[KEY,VAL]]  {
+  
+}
+*/
 
 // ===========================================================================
 object Dummy {
