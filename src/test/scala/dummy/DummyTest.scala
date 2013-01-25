@@ -68,6 +68,28 @@ class DummyTest extends FunSuite with ShouldMatchers {
     l.reduce(_ + _) should equal(10)
   }
 
+  test("CustomVector test") {
+    val l = CustomVector(1, 2, 3, 4)
+    val c = List(5,6,7)    
+  
+    l should not be equals(List(1,2,3,4))
+    
+    (l :+ 8) should be equals (CustomVector(1,2,3,4,8))
+    
+    (l ++ c) should be equals (CustomVector(1,2,3,4,5,6,7))
+    
+    (l.map(_.toString)) should be equals (CustomVector("1","2","3","4"))
+    
+    (l.map(_.toString)) should not be equals (IndexedSeq("1","2","3","4"))
+
+    (l.map(_.toString)).getClass.getName should include("CustomVector")
+
+    (l.filter(_ > 2)) should be equals (CustomVector(3,4))
+    
+    (l.filter(_ > 2)).getClass.getName should include("CustomVector")
+    
+    l.reduce(_ + _) should equal(10)
+  }
   
   
   test("MySeq test") {

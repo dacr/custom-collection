@@ -17,8 +17,9 @@
 package dummy
 
 import scala.collection._
-import scala.collection.mutable.{ArrayBuffer,ListBuffer, Builder} 
+import scala.collection.mutable.{ArrayBuffer,ListBuffer, Builder}
 import scala.collection.generic._
+import scala.collection.immutable.VectorBuilder
 
 
 
@@ -137,6 +138,45 @@ class NamedSeq[Base] protected (
   
   override def toString() = "NamedSeq("+name+" : "+mkString(", ")+")"
 }
+
+// ============================= CustomVector ===================================
+
+object CustomVector {
+
+  def apply[Base](bases: Base*) = fromSeq(bases)
+
+  def fromSeq[Base](buf: Seq[Base]): CustomVector[Base] = {
+    var array = new ArrayBuffer[Base](buf.size)
+    for (i <- 0 until buf.size) array += buf(i)
+    new CustomVector[Base](array)
+  }
+
+  def newBuilder[Base]: Builder[Base, CustomVector[Base]] =
+    new VectorBuilder mapResult fromSeq
+
+  implicit def canBuildFrom[Base,From]: CanBuildFrom[CustomVector[_], Base, CustomVector[Base]] =
+    new CanBuildFrom[CustomVector[_], Base, CustomVector[Base]] {
+      def apply(): Builder[Base, CustomVector[Base]] = newBuilder
+      def apply(from: CustomVector[_]): Builder[Base, CustomVector[Base]] = newBuilder
+    }
+}
+
+
+class CustomVector[Base] protected (buffer: ArrayBuffer[Base])
+       extends IndexedSeq[Base]
+       with IndexedSeqLike[Base, CustomVector[Base]] {
+  
+  override protected[this] def newBuilder: Builder[Base, CustomVector[Base]] = CustomVector.newBuilder
+
+  def apply(idx: Int): Base = {
+    if (idx < 0 || length <= idx) throw new IndexOutOfBoundsException
+    buffer(idx)
+  }
+
+  def length = buffer.length
+
+}
+
 
 // ============================= CustomMap ===================================
 
