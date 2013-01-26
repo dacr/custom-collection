@@ -143,13 +143,9 @@ class NamedSeq[Base] protected (
 
 object CustomVector {
 
-  def apply[Base](bases: Base*) = fromSeq(bases)
+  def apply[Base](bases: Base*) = fromSeq(bases.toVector)
 
-  def fromSeq[Base](buf: Seq[Base]): CustomVector[Base] = {
-    var array = new ArrayBuffer[Base](buf.size)
-    for (i <- 0 until buf.size) array += buf(i)
-    new CustomVector[Base](array)
-  }
+  def fromSeq[Base](buf: Vector[Base]): CustomVector[Base] = new CustomVector[Base](buf)
 
   def newBuilder[Base]: Builder[Base, CustomVector[Base]] =
     new VectorBuilder mapResult fromSeq
@@ -162,7 +158,7 @@ object CustomVector {
 }
 
 
-class CustomVector[Base] protected (buffer: ArrayBuffer[Base])
+class CustomVector[Base] protected (buffer: Vector[Base])
        extends IndexedSeq[Base]
        with IndexedSeqLike[Base, CustomVector[Base]] {
   
