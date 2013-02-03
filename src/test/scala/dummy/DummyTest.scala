@@ -24,6 +24,17 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class DummyTest extends FunSuite with ShouldMatchers {
   
+  
+  test("CustomSet test") {
+    val s = CustomSet("1", "2")
+    val n = s.map(_.toInt)
+    val s2 = s + "3"
+    val n2 = n + 3
+    
+  }
+  
+  
+  
   test("CustomTraversable test") {
     val l = CustomTraversable(1, 2, 3, 4)
     val c = List(5,6,7)    

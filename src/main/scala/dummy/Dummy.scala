@@ -20,6 +20,8 @@ import scala.collection._
 import scala.collection.mutable.{ArrayBuffer,ListBuffer, Builder}
 import scala.collection.generic._
 import scala.collection.immutable.VectorBuilder
+import scala.collection.mutable.SetBuilder
+import scala.collection.immutable.TreeSet
 
 
 
@@ -173,6 +175,31 @@ class CustomVector[Base] protected (buffer: Vector[Base])
 
 }
 
+
+// ============================= CustomSet ===================================
+object CustomSet {//}extends ImmutableSetFactory[CustomSet] {
+  
+  def apply[A](s:A*) = new CustomSet(s.toSet)
+  
+  implicit def canBuildFrom[A,B]: CanBuildFrom[CustomSet[B], A, CustomSet[A]] = new CanBuildFrom[CustomSet[B], A, CustomSet[A]] {
+    def apply(from: CustomSet[B]) = newBuilder
+    def apply() = newBuilder
+  }
+  def empty[A] = new CustomSet[A]()
+  def newBuilder[A]: Builder[A, CustomSet[A]] =  new SetBuilder[A, CustomSet[A]](empty)
+}
+
+
+class CustomSet[A] protected(backend:Set[A]=Set.empty[A])
+  extends Set[A]
+  with SetLike[A, CustomSet[A]] {
+  
+  def contains(key: A): Boolean = backend.contains(key)
+  def iterator: Iterator[A] = backend.iterator
+  def +(elem: A)  = if ( contains(elem)) this else new CustomSet(backend+elem)
+  def -(elem: A)  = if (!contains(elem)) this else new CustomSet(backend-elem)
+  override def empty = CustomSet.empty
+}
 
 // ============================= CustomMap ===================================
 
