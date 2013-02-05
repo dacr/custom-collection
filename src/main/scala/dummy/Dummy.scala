@@ -201,6 +201,47 @@ class CustomSet[A] protected(backend:Set[A]=Set.empty[A])
   override def empty = CustomSet.empty
 }
 
+
+// ============================= NamedCustomSet ===================================
+object NamedCustomSet {
+  
+  def apply[A](name:String, s:A*) = new NamedCustomSet(name, s.toSet)
+  
+  implicit def canBuildFrom[A,B]: CanBuildFrom[NamedCustomSet[B], A, NamedCustomSet[A]] = 
+    new CanBuildFrom[NamedCustomSet[B], A, NamedCustomSet[A]] {
+      def apply(from: NamedCustomSet[B]) = newBuilder(from.name)
+      def apply() = newBuilder
+  }
+  def empty[A] = new NamedCustomSet[A]("empty")
+  
+  def newBuilder[A]: Builder[A, NamedCustomSet[A]] =  
+    new SetBuilder[A, NamedCustomSet[A]](empty)
+    
+  def newBuilder[A](name:String): Builder[A, NamedCustomSet[A]] =  
+    new SetBuilder[A, NamedCustomSet[A]](new NamedCustomSet[A](name))
+}
+
+
+class NamedCustomSet[A](val name:String, protected val backend:Set[A]=Set.empty[A])
+  extends Set[A]
+  with SetLike[A, NamedCustomSet[A]] {
+  
+  def contains(key: A): Boolean = backend.contains(key)
+  def iterator: Iterator[A] = backend.iterator
+  def +(elem: A)  = if ( contains(elem)) this else new NamedCustomSet(name, backend+elem)
+  def -(elem: A)  = if (!contains(elem)) this else new NamedCustomSet(name, backend-elem)
+  override def empty = NamedCustomSet.empty
+  override def toString = {
+    val content = size match {
+      case 0 => ""
+      case x if x < 10 => mkString(",",",","")
+      case _ => take(9).mkString(",",",","...")
+    }
+    "NamedCustomSet("+name+content+")"
+  }
+}
+
+
 // ============================= CustomMap ===================================
 
 /*
