@@ -1,12 +1,8 @@
-import AssemblyKeys._
-
-seq(assemblySettings: _*)
-
 name := "custom-collection"
 
-version := "2013-01-22"
+version := "2016-05-12"
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.11.8"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
@@ -15,8 +11,8 @@ mainClass in assembly := Some("dummy.Dummy")
 jarName in assembly := "custcol.jar"
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "2.0.M5b" % "test"
- ,"junit"          % "junit"     % "4.10"  % "test"
+  "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+ ,"junit"          % "junit"     % "4.12"  % "test"
 )
 
 

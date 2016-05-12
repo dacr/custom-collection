@@ -9,3 +9,5 @@ target/
 .cache
 .settings
 nohup.out
+.ensime
+.ensime_cache

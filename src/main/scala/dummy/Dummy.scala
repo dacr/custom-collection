@@ -262,3 +262,68 @@ object Dummy {
 
   }
 }
+
+
+
+
+// ===========================================================================
+
+case class Thing()
+
+import scala.collection.SetLike
+import scala.collection.generic.{GenericSetTemplate, GenericCompanion, CanBuildFrom}
+import scala.collection.mutable.{Builder, SetBuilder}
+
+class ThingSet(seq : Thing*) extends Set[Thing] 
+                             with SetLike[Thing, ThingSet]
+                             with Serializable {
+    override def empty: ThingSet = new ThingSet()
+    def + (elem: Thing) : ThingSet = if (seq contains elem) this 
+        else new ThingSet(elem +: seq: _*)
+    def - (elem: Thing) : ThingSet = if (!(seq contains elem)) this
+        else new ThingSet(seq filterNot (elem ==): _*)
+    def contains (elem: Thing) : Boolean = seq exists (elem ==)
+    def iterator : Iterator[Thing] = seq.iterator
+}
+
+object ThingSet {
+    def empty: ThingSet = new ThingSet()
+    def newBuilder: Builder[Thing, ThingSet] = new SetBuilder[Thing, ThingSet](empty)
+    def apply(elems: Thing*): ThingSet = (empty /: elems) (_ + _)
+    def thingSetCanBuildFrom = new CanBuildFrom[ThingSet, Thing, ThingSet] {
+        def apply(from: ThingSet) = newBuilder
+        def apply() = newBuilder
+    }
+}
+
+// ===========================================================================
+/*
+
+import scala.collection.SetLike
+import scala.collection.generic.{GenericSetTemplate, GenericCompanion, CanBuildFrom}
+import scala.collection.mutable.{Builder, SetBuilder}
+
+class DummySet[+D](seq : D*) extends Set[D] 
+                             with SetLike[D, DummySet[D]]
+                             with Serializable {
+    override def empty: DummySet[D] = new DummySet[D]()
+    def + (elem: D) : DummySet[D] = if (seq contains elem) this 
+        else new DummySet(elem +: seq: _*)
+    def - (elem: D) : DummySet[D] = if (!(seq contains elem)) this
+        else new DummySet(seq filterNot (elem ==): _*)
+    def contains (elem: D) : Boolean = seq exists (elem ==)
+    def iterator : Iterator[D] = seq.iterator
+}
+
+object DummySet {
+    def empty: DummySet = new DummySet()
+    def newBuilder: Builder[Dummy, DummySet] = new SetBuilder[Dummy, DummySet](empty)
+    def apply[D](elems: D*): DummySet[D] = (empty /: elems) (_ + _)
+    def DummySetCanBuildFrom = new CanBuildFrom[DummySet, Dummy, DummySet] {
+        def apply(from: DummySet) = newBuilder
+        def apply() = newBuilder
+    }
+}
+
+
+*/
