@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 David Crosson
+ * Copyright 2016 David Crosson
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package dummy
 
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.ShouldMatchers
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
@@ -162,4 +162,10 @@ class DummyTest extends FunSuite with ShouldMatchers {
     (scs.map(_.toString))  should be equals(MySeq("7","8"))
   }
   
+  
+  test("DummySet test") {
+    val ds = DummySet[Int]("toto")
+    val nds = ds + 1
+    nds should have size(1)
+  }
 }

@@ -21,8 +21,8 @@ import scala.collection.mutable.{ArrayBuffer,ListBuffer, Builder}
 import scala.collection.generic._
 import scala.collection.immutable.VectorBuilder
 import scala.collection.mutable.SetBuilder
-import scala.collection.immutable.TreeSet
 
+import scala.language.postfixOps
 
 
 // ================================ CustomTraversable ==================================
@@ -258,7 +258,7 @@ class CustomMap[KEY,VAL] protected()
 
 // ===========================================================================
 object Dummy {
-  def main(args: Array[String]) {
+  def main(args: Array[String]):Unit = {
 
   }
 }
@@ -275,8 +275,7 @@ import scala.collection.generic.{GenericSetTemplate, GenericCompanion, CanBuildF
 import scala.collection.mutable.{Builder, SetBuilder}
 
 class ThingSet(seq : Thing*) extends Set[Thing] 
-                             with SetLike[Thing, ThingSet]
-                             with Serializable {
+                             with SetLike[Thing, ThingSet] {
     override def empty: ThingSet = new ThingSet()
     def + (elem: Thing) : ThingSet = if (seq contains elem) this 
         else new ThingSet(elem +: seq: _*)
@@ -297,33 +296,43 @@ object ThingSet {
 }
 
 // ===========================================================================
-/*
+
 
 import scala.collection.SetLike
 import scala.collection.generic.{GenericSetTemplate, GenericCompanion, CanBuildFrom}
 import scala.collection.mutable.{Builder, SetBuilder}
 
-class DummySet[+D](seq : D*) extends Set[D] 
-                             with SetLike[D, DummySet[D]]
-                             with Serializable {
-    override def empty: DummySet[D] = new DummySet[D]()
-    def + (elem: D) : DummySet[D] = if (seq contains elem) this 
-        else new DummySet(elem +: seq: _*)
-    def - (elem: D) : DummySet[D] = if (!(seq contains elem)) this
-        else new DummySet(seq filterNot (elem ==): _*)
-    def contains (elem: D) : Boolean = seq exists (elem ==)
-    def iterator : Iterator[D] = seq.iterator
+class DummySet[A](val name:String, set : Set[A]) extends Set[A] 
+                             with SetLike[A, DummySet[A]] {
+
+  def +(elem: A): DummySet[A] = new DummySet[A](name, set + elem)
+  def -(elem: A): DummySet[A] = new DummySet[A](name, set - elem)
+  def contains(elem: A): Boolean = set contains elem
+  def iterator: Iterator[A] = set.iterator
+
+  override def companion = DummySet
+  override def empty: DummySet[A] = DummySet.empty[A]
+  // Required for `filter`, `take`, `drop`, etc. to preserve `someProperty`.
+  override def newBuilder: mutable.Builder[A, DummySet[A]] = 
+    DummySet.newBuilder[A](name)
 }
 
-object DummySet {
-    def empty: DummySet = new DummySet()
-    def newBuilder: Builder[Dummy, DummySet] = new SetBuilder[Dummy, DummySet](empty)
-    def apply[D](elems: D*): DummySet[D] = (empty /: elems) (_ + _)
-    def DummySetCanBuildFrom = new CanBuildFrom[DummySet, Dummy, DummySet] {
-        def apply(from: DummySet) = newBuilder
-        def apply() = newBuilder
+
+object DummySet extends SetFactory[DummySet] {
+  class DummySetBuilder[A](name: String) extends 
+    mutable.SetBuilder[A, DummySet[A]](new DummySet(name, Set.empty))
+
+  def newBuilder[A]:DummySetBuilder[A] = newBuilder[A]("")
+  def newBuilder[A](name: String) = new DummySetBuilder[A](name)
+
+  override def empty[A]= new DummySet[A]("", Set.empty)
+  def apply[A](name:String) = new DummySet[A](name, Set.empty)
+
+  implicit def canBuildFrom[A]: CanBuildFrom[DummySet[_], A, DummySet[A]] =
+    new CanBuildFrom[DummySet[_], A, DummySet[A]] {
+      def apply(from: DummySet[_]): mutable.Builder[A, DummySet[A]] = newBuilder[A](from.name)
+      def apply(): mutable.Builder[A, DummySet[A]] = newBuilder[A]
     }
 }
 
 
-*/
