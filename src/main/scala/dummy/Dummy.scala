@@ -336,3 +336,90 @@ object DummySet extends SetFactory[DummySet] {
 }
 
 
+
+
+// ===========================================================================
+
+// grrrr : Set are invariant !!! no covariance ! so no way to make this work !!!
+
+
+/*
+trait Cell {
+  val time:Long
+  val value:Double
+}
+
+class DummyCellSet[+A <: Cell](val name:String, set : Set[A]) extends Set[A] 
+                             with SetLike[A, DummyCellSet[A]] {
+
+  def +(elem: A): DummyCellSet[A] = new DummyCellSet[A](name, set + elem)
+  def -(elem: A): DummyCellSet[A] = new DummyCellSet[A](name, set - elem)
+  def contains(elem: A): Boolean = set contains elem
+  def iterator: Iterator[A] = set.iterator
+
+  override def companion = DummyCellSet
+  override def empty: DummyCellSet[A] = DummyCellSet.empty[A]
+  // Required for `filter`, `take`, `drop`, etc. to preserve `someProperty`.
+  override def newBuilder: mutable.Builder[A, DummyCellSet[A]] = 
+    DummyCellSet.newBuilder[A](name)
+}
+
+
+object DummyCellSet extends SetFactory[DummyCellSet] {
+  class DummyCellSetBuilder[A](name: String) extends 
+    mutable.SetBuilder[A, DummyCellSet[A]](new DummyCellSet(name, Set.empty))
+
+  def newBuilder[A]:DummyCellSetBuilder[A] = newBuilder[A]("")
+  def newBuilder[A](name: String) = new DummyCellSetBuilder[A](name)
+
+  override def empty[A]= new DummyCellSet[A]("", Set.empty)
+  def apply[A](name:String) = new DummyCellSet[A](name, Set.empty)
+
+  implicit def canBuildFrom[A]: CanBuildFrom[DummyCellSet[_], A, DummyCellSet[A]] =
+    new CanBuildFrom[DummyCellSet[_], A, DummyCellSet[A]] {
+      def apply(from: DummyCellSet[_]): mutable.Builder[A, DummyCellSet[A]] = newBuilder[A](from.name)
+      def apply(): mutable.Builder[A, DummyCellSet[A]] = newBuilder[A]
+    }
+}
+*/
+
+
+
+// ===========================================================================
+
+trait Cell {
+  val time:Long
+  val value:Double
+}
+
+class BaseCell(
+  val time:Long,
+  val value:Double
+)
+
+class StatCell(
+  time:Long,
+  value:Double,
+  val avg:Double
+) extends BaseCell(time, value)
+
+
+
+object DummyCellColl extends SeqFactory[DummyCellColl] {
+  implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, DummyCellColl[A]] = new GenericCanBuildFrom[A]
+  def newBuilder[A] = new ListBuffer[A] mapResult (x => new DummyCellColl(x:_*))
+}
+
+class DummyCellColl[+A](seq : A*) 
+     extends Seq[A]
+     with GenericTraversableTemplate[A, DummyCellColl]
+     with SeqLike[A, DummyCellColl[A]] {
+  
+  override def companion = DummyCellColl
+  def iterator: Iterator[A] = seq.iterator
+  def apply(idx: Int): A = {
+    if (idx < 0 || idx>=length) throw new IndexOutOfBoundsException
+    seq(idx)
+  }
+  def length: Int = seq.size
+}

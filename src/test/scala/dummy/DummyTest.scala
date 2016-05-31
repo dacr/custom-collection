@@ -168,4 +168,10 @@ class DummyTest extends FunSuite with ShouldMatchers {
     val nds = ds + 1
     nds should have size(1)
   }
+  
+  test("DummyCellColl") {
+    val dc1:DummyCellColl[StatCell] = new DummyCellColl(new StatCell(1L,2d, 0d))
+    val dc2:DummyCellColl[BaseCell] = dc1 :+ new BaseCell(2L, 3d)
+    val dc3:DummyCellColl[BaseCell] = dc2 :+ new StatCell(2L, 3d, 1d)
+  }
 }
